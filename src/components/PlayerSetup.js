@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 const PlayerSetup = ({ onStartGame }) => {
   const [playerCount, setPlayerCount] = useState(2);
-  const [startingScore, setStartingScore] = useState(180);
+  const [startingScore] = useState(180);
   const [playerNames, setPlayerNames] = useState(['Player 1', 'Player 2']);
 
   const handlePlayerCountChange = (count) => {
@@ -16,15 +16,20 @@ const PlayerSetup = ({ onStartGame }) => {
 
   const handlePlayerNameChange = (index, name) => {
     const newNames = [...playerNames];
-    newNames[index] = name || `Player ${index + 1}`;
+    newNames[index] = name;
     setPlayerNames(newNames);
   };
 
   const handleStartGame = () => {
+    // Provide default names for empty fields
+    const finalPlayerNames = playerNames.map((name, index) => 
+      name.trim() || `Player ${index + 1}`
+    );
+    
     onStartGame({
       playerCount,
       startingScore,
-      playerNames: playerNames.filter(name => name.trim() !== '')
+      playerNames: finalPlayerNames
     });
   };
 
@@ -98,6 +103,10 @@ const PlayerSetup = ({ onStartGame }) => {
                       className="input-field flex-1"
                       placeholder={`Player ${index + 1}`}
                       maxLength={20}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="words"
+                      spellCheck="false"
                     />
                   </div>
                 ))}
@@ -148,10 +157,15 @@ const PlayerSetup = ({ onStartGame }) => {
             <button
               onClick={handleStartGame}
               className="btn-primary btn-lg w-full"
-              disabled={playerNames.length < 2}
+              disabled={playerCount < 2}
             >
               Start Game
             </button>
+            
+            {/* Helper text for empty names */}
+            <p className="text-center text-caption mt-2">
+              Empty names will default to "Player 1", "Player 2", etc.
+            </p>
           </div>
         </div>
       </div>
