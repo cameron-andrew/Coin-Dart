@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Scoreboard from './Scoreboard';
-import PenaltyPanel from './PenaltyPanel';
 import PenaltyLeaderboard from './PenaltyLeaderboard';
 import PenaltyTracker from './PenaltyTracker';
 import SessionStats from './SessionStats';

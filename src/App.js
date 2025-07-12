@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useGameState from './hooks/useGameState';
+import useDataPersistence from './hooks/useDataPersistence';
 import PlayerSetup from './components/PlayerSetup';
 import Scoreboard from './components/Scoreboard';
 import ScoreInput from './components/ScoreInput';
 import PenaltyPanel from './components/PenaltyPanel';
 import SessionStats from './components/SessionStats';
 import MobileTabs from './components/MobileTabs';
+import StatisticsDashboard from './components/StatisticsDashboard';
+import PlayerProfile from './components/PlayerProfile';
 import './index.css';
 
 function App() {
+  const [showStatistics, setShowStatistics] = useState(false);
+  const [showPlayerProfile, setShowPlayerProfile] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [gameStartTime, setGameStartTime] = useState(null);
+
   const {
     gameState,
     initializeGame,
@@ -22,6 +30,37 @@ function App() {
     validateScore
   } = useGameState();
 
+  const {
+    playerProfiles,
+    gameHistory,
+    analytics,
+    createOrUpdatePlayerProfile,
+    getPlayerStatistics,
+    saveGameToHistory,
+    trackEvent
+  } = useDataPersistence();
+
+  // Track game start time
+  useEffect(() => {
+    if (gameState.gameStarted && !gameStartTime) {
+      setGameStartTime(Date.now());
+      trackEvent('game_started', { playerCount: gameState.players.length });
+    }
+  }, [gameState.gameStarted, gameStartTime, gameState.players.length, trackEvent]);
+
+  // Handle game completion
+  useEffect(() => {
+    if (gameState.winner && gameStartTime) {
+      const gameDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+      saveGameToHistory({
+        ...gameState,
+        duration: gameDuration,
+        startingScore: 180 // Could be dynamic based on game config
+      });
+      setGameStartTime(null);
+    }
+  }, [gameState.winner, gameStartTime, gameState, saveGameToHistory]);
+
   const handleScoreSubmit = (turnScore, dartScores) => {
     const currentPlayer = getCurrentPlayer();
     if (!currentPlayer) return;
@@ -33,30 +72,58 @@ function App() {
       addPenalty(currentPlayer.id, 5, 'Bust');
       // Score remains the same for bust
       updatePlayerScore(currentPlayer.id, currentPlayer.score, dartScores, true);
+      trackEvent('bust_occurred', { playerId: currentPlayer.id });
     } else {
       updatePlayerScore(currentPlayer.id, validation.newScore, dartScores, false);
+      trackEvent('score_submitted', { 
+        playerId: currentPlayer.id, 
+        score: turnScore,
+        isWin: validation.isWin 
+      });
     }
   };
 
   const handlePenaltyAdd = (playerId, amount, reason) => {
     addPenalty(playerId, amount, reason);
+    trackEvent('penalty_added', { playerId, amount, reason });
   };
 
   const handleUndoPenalty = (playerId) => {
     undoPenalty(playerId);
+    trackEvent('penalty_undone', { playerId });
   };
 
   const handleUndo = () => {
     undoLastAction();
+    trackEvent('action_undone');
   };
 
   const handleNewGame = () => {
     resetGame();
+    setGameStartTime(null);
+    trackEvent('new_game_started');
   };
 
   const handleNewRound = () => {
     startNewRound();
+    setGameStartTime(Date.now());
+    trackEvent('new_round_started');
   };
+
+  const handleShowStatistics = () => {
+    setShowStatistics(true);
+    trackEvent('statistics_viewed');
+  };
+
+  // Removed unused handleShowPlayerProfile function
+
+  const handleUpdatePlayerProfile = (updatedProfile) => {
+    createOrUpdatePlayerProfile(updatedProfile);
+    setSelectedProfile(updatedProfile);
+    trackEvent('player_profile_updated', { playerId: updatedProfile.id });
+  };
+
+  // Removed multiplayer functionality
 
   if (!gameState.gameStarted) {
     return <PlayerSetup onStartGame={initializeGame} />;
@@ -79,12 +146,18 @@ function App() {
           <div className="text-body mb-6">
             Round {gameState.currentRound} • {gameState.sessionStats.totalRounds} rounds completed
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleNewGame}
               className="btn-secondary btn-sm"
             >
               New Session
+            </button>
+            <button
+              onClick={handleShowStatistics}
+              className="btn-ghost btn-sm"
+            >
+              📊 Stats
             </button>
           </div>
         </div>
@@ -115,6 +188,12 @@ function App() {
                     className="btn-secondary"
                   >
                     End Session
+                  </button>
+                  <button
+                    onClick={handleShowStatistics}
+                    className="btn-ghost"
+                  >
+                    📊 Statistics
                   </button>
                 </div>
               </div>
@@ -217,6 +296,28 @@ function App() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      {showStatistics && (
+        <StatisticsDashboard
+          playerProfiles={playerProfiles}
+          gameHistory={gameHistory}
+          analytics={analytics}
+          getPlayerStatistics={getPlayerStatistics}
+          onClose={() => setShowStatistics(false)}
+        />
+      )}
+
+      {showPlayerProfile && selectedProfile && (
+        <PlayerProfile
+          profile={selectedProfile}
+          onUpdateProfile={handleUpdatePlayerProfile}
+          onClose={() => {
+            setShowPlayerProfile(false);
+            setSelectedProfile(null);
+          }}
+        />
+      )}
     </div>
   );
 }
