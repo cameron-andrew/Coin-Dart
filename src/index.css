@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply antialiased;
+  }
+  
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  
+  :root {
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+}
+
+@layer components {
+  /* Button System */
+  .btn {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm hover:shadow-md focus:ring-blue-500 rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px];
+  }
+  
+  .btn-secondary {
+    @apply btn bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700 hover:border-slate-600 shadow-sm hover:shadow-md focus:ring-slate-500 rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px];
+  }
+  
+  .btn-danger {
+    @apply btn bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-sm hover:shadow-md focus:ring-red-500 rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px];
+  }
+  
+  .btn-success {
+    @apply btn bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-sm hover:shadow-md focus:ring-emerald-500 rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px];
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-slate-800 active:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-xl px-4 py-2.5 text-sm font-medium min-h-[44px];
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs min-h-[36px] rounded-lg;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-base min-h-[48px] rounded-xl;
+  }
+  
+  /* Input System */
+  .input-field {
+    @apply bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:border-slate-600 min-h-[44px] text-sm;
+  }
+  
+  .input-field:focus {
+    @apply shadow-lg;
+  }
+  
+  /* Card System */
+  .card {
+    @apply bg-slate-900/50 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-800/50 overflow-hidden;
+  }
+  
+  .card-header {
+    @apply px-6 py-4 border-b border-slate-800/50 bg-slate-900/30;
+  }
+  
+  .card-body {
+    @apply px-6 py-5;
+  }
+  
+  .card-compact {
+    @apply bg-slate-900/30 rounded-xl shadow-md border border-slate-800/30;
+  }
+  
+  /* Typography */
+  .text-display {
+    @apply text-3xl lg:text-4xl font-bold tracking-tight;
+  }
+  
+  .text-title {
+    @apply text-xl lg:text-2xl font-semibold tracking-tight;
+  }
+  
+  .text-subtitle {
+    @apply text-base lg:text-lg font-medium text-slate-300;
+  }
+  
+  .text-body {
+    @apply text-sm text-slate-400;
+  }
+  
+  .text-caption {
+    @apply text-xs text-slate-500;
+  }
+  
+  /* Score Display */
+  .score-display {
+    @apply text-display font-mono text-center tabular-nums;
+  }
+  
+  /* Status Indicators */
+  .status-success {
+    @apply bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
+  }
+  
+  .status-warning {
+    @apply bg-amber-500/10 text-amber-400 border border-amber-500/20;
+  }
+  
+  .status-error {
+    @apply bg-red-500/10 text-red-400 border border-red-500/20;
+  }
+  
+  .status-info {
+    @apply bg-blue-500/10 text-blue-400 border border-blue-500/20;
+  }
+  
+  /* Animations */
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .card {
+      @apply rounded-xl;
+    }
+    
+    .card-body {
+      @apply px-4 py-4;
+    }
+    
+    .card-header {
+      @apply px-4 py-3;
+    }
+  }
+} 
